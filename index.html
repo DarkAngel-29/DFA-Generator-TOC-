@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DFA Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #7f92e7 0%, #764ba2 100%);
+            padding: 40px;
+            text-align: center;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            display: inline-block;
+        }
+        
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .rule-btn {
+            padding: 18px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            border: 3px solid #667eea;
+            background: white;
+            color: #667eea;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .rule-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .rule-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #764ba2;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .input-area {
+            background: #f8f9ff;
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #e0e5ff;
+            margin-top: 20px;
+        }
+        
+        .input-box {
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .input-box.visible {
+            display: block;
+        }
+        
+        .input-box label {
+            display: block;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .input-box input {
+            width: 100%;
+            padding: 14px 18px;
+            font-size: 15px;
+            border: 2px solid #d0d5ff;
+            border-radius: 10px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+        
+        .input-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .action-section {
+            margin-top: 30px;
+        }
+        
+        .build-btn {
+            padding: 16px 40px;
+            font-size: 17px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .build-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(102, 126, 234, 0.4);
+        }
+        
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #667eea, transparent);
+            margin: 40px 0;
+        }
+        
+        .test-section {
+            background: #fff8f0;
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #ffe5cc;
+        }
+        
+        .test-input-group {
+            margin-bottom: 20px;
+        }
+        
+        .test-input-group label {
+            display: block;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .test-input-group input {
+            width: 100%;
+            padding: 14px 18px;
+            font-size: 15px;
+            border: 2px solid #ffd4a3;
+            border-radius: 10px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+        
+        .test-input-group input:focus {
+            outline: none;
+            border-color: #ff9a3c;
+            box-shadow: 0 0 0 3px rgba(255, 154, 60, 0.1);
+        }
+        
+        .test-btn {
+            padding: 16px 40px;
+            font-size: 17px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(245, 87, 108, 0.3);
+        }
+        
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(245, 87, 108, 0.4);
+        }
+        
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            font-size: 20px;
+            font-weight: 700;
+            text-align: center;
+            border-radius: 12px;
+            display: none;
+        }
+        
+        #result.valid {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            color: #006644;
+            border: 3px solid #5dd39e;
+            display: block;
+        }
+        
+        #result.invalid {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+            color: #d63031;
+            border: 3px solid #fab1a0;
+            display: block;
+        }
+        
+        .diagram-section {
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        #dfaImage {
+            max-width: 100%;
+            border-radius: 15px;
+            border: 3px solid #e0e5ff;
+            margin-top: 20px;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        #dfaImage.visible {
+            display: block;
+            margin: 20px auto;
+            margin-left: 33%;
+        }
+        
+        @media (max-width: 768px) {
+            .button-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .header h1 {
+                font-size: 32px;
+            }
+            
+            .content {
+                padding: 30px 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .button-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>DFA Generator</h1>
+            <p>Design and Test Deterministic Finite Automata</p>
+        </div>
+        
+        <div class="content">
+            <!-- SECTION 1: Rule Selection -->
+            <div class="section">
+                <div class="section-title">Step 1: Select DFA Rule</div>
+                <div class="button-grid">
+                    <button class="rule-btn" id="btn-even">even()</button>
+                    <button class="rule-btn" id="btn-odd">odd()</button>
+                    <button class="rule-btn" id="btn-starts">starts_with()</button>
+                    <button class="rule-btn" id="btn-ends">ends_with()</button>
+                    <button class="rule-btn" id="btn-contains">contains()</button>
+                    <button class="rule-btn" id="btn-no-substring">no_substring()</button>
+                    <button class="rule-btn" id="btn-exact">exact_count()</button>
+                    <button class="rule-btn" id="btn-at-least">at_least()</button>
+                    <button class="rule-btn" id="btn-length-mod">length_mod()</button>
+                </div>
+            </div>
+            
+            <!-- SECTION 2: Input Area (Dynamic) -->
+            <div class="section">
+                <div class="section-title">Step 2: Configure Parameters</div>
+                <div class="input-area">
+                    <!-- Alphabet Box (Always visible when rule selected) -->
+                    <div class="input-box" id="alphabetBox">
+                        <label for="alphabet">Alphabet (comma-separated symbols):</label>
+                        <input type="text" id="alphabet" placeholder="a,b,c">
+                    </div>
+                    
+                    <!-- Symbol Box -->
+                    <div class="input-box" id="symbolBox">
+                        <label for="symbol">Symbol:</label>
+                        <input type="text" id="symbol" placeholder="a">
+                    </div>
+                    
+                    <!-- Pattern Box -->
+                    <div class="input-box" id="patternBox">
+                        <label for="pattern">Pattern:</label>
+                        <input type="text" id="pattern" placeholder="ab">
+                    </div>
+                    
+                    <!-- K Box -->
+                    <div class="input-box" id="kBox">
+                        <label for="k">Number (k):</label>
+                        <input type="number" id="k" placeholder="3" min="0">
+                    </div>
+                </div>
+                
+                <!-- Action Section -->
+                <div class="action-section">
+                    <button class="build-btn" id="buildBtn">Build DFA</button>
+                </div>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <!-- SECTION 3: DFA Actions (Test) -->
+            <div class="section">
+                <div class="section-title">Step 3: Test Your DFA</div>
+                <div class="test-section">
+                    <div class="test-input-group">
+                        <label for="testString">Input String:</label>
+                        <input type="text" id="testString" placeholder="Enter a string to test">
+                    </div>
+                    
+                    <button class="test-btn" id="testBtn">Test String</button>
+                    
+                    <p id="result"></p>
+                </div>
+            </div>
+            
+            <!-- DFA Diagram Section -->
+            <div class="section diagram-section">
+                <div class="section-title">DFA State Diagram</div>
+                <img id="dfaImage" src="" alt="DFA diagram will appear here">
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+let currentRule = null;
+
+// Utility: hide all input boxes
+function hideAllInputs() {
+    document.getElementById("alphabetBox").classList.remove("visible");
+    document.getElementById("symbolBox").classList.remove("visible");
+    document.getElementById("patternBox").classList.remove("visible");
+    document.getElementById("kBox").classList.remove("visible");
+}
+
+// Utility: deactivate all rule buttons
+function deactivateButtons() {
+    document.querySelectorAll(".rule-btn").forEach(btn => {
+        btn.classList.remove("active");
+    });
+}
+
+// Core: handle rule selection
+function selectRule(rule, btnId) {
+    currentRule = rule;
+    hideAllInputs();
+    deactivateButtons();
+
+    document.getElementById(btnId).classList.add("active");
+    document.getElementById("alphabetBox").classList.add("visible");
+
+    if (["even", "odd"].includes(rule)) {
+        document.getElementById("symbolBox").classList.add("visible");
+    }
+
+    if (["starts_with", "ends_with", "contains", "no_substring"].includes(rule)) {
+        document.getElementById("patternBox").classList.add("visible");
+    }
+
+    if (["exact_count", "at_least", "length_mod"].includes(rule)) {
+        document.getElementById("kBox").classList.add("visible");
+    }
+}
+
+// Button bindings
+document.getElementById("btn-even").onclick = () => selectRule("even", "btn-even");
+document.getElementById("btn-odd").onclick = () => selectRule("odd", "btn-odd");
+document.getElementById("btn-starts").onclick = () => selectRule("starts_with", "btn-starts");
+document.getElementById("btn-ends").onclick = () => selectRule("ends_with", "btn-ends");
+document.getElementById("btn-contains").onclick = () => selectRule("contains", "btn-contains");
+document.getElementById("btn-no-substring").onclick = () => selectRule("no_substring", "btn-no-substring");
+document.getElementById("btn-exact").onclick = () => selectRule("exact_count", "btn-exact");
+document.getElementById("btn-at-least").onclick = () => selectRule("at_least", "btn-at-least");
+document.getElementById("btn-length-mod").onclick = () => selectRule("length_mod", "btn-length-mod");
+
+
+document.getElementById("buildBtn").onclick = async () => {
+    if (!currentRule) {
+        alert("Select a rule first");
+        return;
+    }
+
+    const alphabet = document.getElementById("alphabet").value.split(",");
+    const symbol = document.getElementById("symbol").value;
+    const pattern = document.getElementById("pattern").value;
+    const k = Number(document.getElementById("k").value);
+
+    const res = await fetch("/build", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            rule: currentRule,
+            alphabet: alphabet,
+            symbol: symbol,
+            pattern: pattern,
+            k: k
+        })
+    });
+
+    const img = document.getElementById("dfaImage");
+    img.src = "/static/dfa.png?" + new Date().getTime();
+    img.classList.add("visible");
+};
+
+document.getElementById("testBtn").onclick = async () => {
+    const s = document.getElementById("testString").value;
+
+    const res = await fetch("/test", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ string: s })
+    });
+
+    const data = await res.json();
+    const result = document.getElementById("result");
+
+    if (data.valid) {
+        result.textContent = "VALID";
+        result.className = "valid";
+    } else {
+        result.textContent = "INVALID";
+        result.className = "invalid";
+    }
+};
+
+</script>
+
+
+</html>
