@@ -10,6 +10,7 @@ from at_least_dfa import build_at_least_dfa
 from length_mod_dfa import build_length_mod_dfa
 import os
 from flask_cors import CORS
+import time
 
 app = Flask(__name__, static_folder="static")
 CORS(app)
@@ -45,15 +46,16 @@ def build():
         current_dfa = build_length_mod_dfa(alphabet, data["k"])
 
     # generate DFA diagram (safe)
+    filename = f"static/dfa_{int(time.time())}"
     try:
-        current_dfa.draw("static/dfa")
+        current_dfa.draw(filename)
     except Exception:
         pass
-
+    
     return jsonify({
-    "status": "DFA built",
-    "image": "static/dfa.png"
-})
+        "status": "DFA built",
+        "image": filename + ".png"
+    })
 
 
 @app.route("/test", methods=["POST"])

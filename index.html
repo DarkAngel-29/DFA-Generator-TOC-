@@ -447,10 +447,9 @@ document.getElementById("buildBtn").onclick = async () => {
     });
 
     const data = await res.json();
-    console.log("Build response:", data);
 
     const img = document.getElementById("dfaImage");
-    img.src = "https://dfa-generator-0kvl.onrender.com/static/dfa.png?" + new Date().getTime();
+    img.src = "https://dfa-generator-0kvl.onrender.com/" + data.image;
     img.classList.add("visible");
 };
 
