@@ -434,7 +434,7 @@ document.getElementById("buildBtn").onclick = async () => {
     const pattern = document.getElementById("pattern").value;
     const k = Number(document.getElementById("k").value);
 
-    const res = await fetch("/build", {
+    const res = await fetch("https://dfa-generator-0kvl.onrender.com/build", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
@@ -446,21 +446,25 @@ document.getElementById("buildBtn").onclick = async () => {
         })
     });
 
+    const data = await res.json();
+    console.log("Build response:", data);
+
     const img = document.getElementById("dfaImage");
-    img.src = "/static/dfa.png?" + new Date().getTime();
+    img.src = "https://dfa-generator-0kvl.onrender.com/static/dfa.png?" + new Date().getTime();
     img.classList.add("visible");
 };
 
 document.getElementById("testBtn").onclick = async () => {
     const s = document.getElementById("testString").value;
 
-    const res = await fetch("/test", {
+    const res = await fetch("https://dfa-generator-0kvl.onrender.com/test", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({ string: s })
     });
 
     const data = await res.json();
+    console.log("Test response:", data);
     const result = document.getElementById("result");
 
     if (data.valid) {
