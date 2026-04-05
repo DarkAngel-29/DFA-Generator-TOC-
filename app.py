@@ -9,8 +9,10 @@ from exact_count_dfa import build_exact_count_dfa
 from at_least_dfa import build_at_least_dfa
 from length_mod_dfa import build_length_mod_dfa
 import os
+from flask_cors import CORS
 
 app = Flask(__name__, static_folder="static")
+CORS(app)
 
 current_dfa = None   # store DFA in memory
 
