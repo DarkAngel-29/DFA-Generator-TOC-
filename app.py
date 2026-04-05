@@ -8,6 +8,7 @@ from no_substring_dfa import build_no_substring_dfa
 from exact_count_dfa import build_exact_count_dfa
 from at_least_dfa import build_at_least_dfa
 from length_mod_dfa import build_length_mod_dfa
+import os
 
 app = Flask(__name__, static_folder="static")
 
@@ -47,7 +48,10 @@ def build():
     except Exception:
         pass
 
-    return jsonify({"status": "DFA built"})
+    return jsonify({
+    "status": "DFA built",
+    "image": "static/dfa.png"
+})
 
 
 @app.route("/test", methods=["POST"])
@@ -65,4 +69,4 @@ def index():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
