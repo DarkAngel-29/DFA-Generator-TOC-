@@ -46,15 +46,11 @@ def build():
         current_dfa = build_length_mod_dfa(alphabet, data["k"])
 
     # generate DFA diagram (safe)
-    filename = f"static/dfa_{int(time.time())}"
-    try:
-        current_dfa.draw(filename)
-    except Exception:
-        pass
-    
+    dot = current_dfa.to_dot()
+
     return jsonify({
         "status": "DFA built",
-        "image": filename + ".png"
+        "dot": dot
     })
 
 

@@ -365,12 +365,13 @@
             <!-- DFA Diagram Section -->
             <div class="section diagram-section">
                 <div class="section-title">DFA State Diagram</div>
-                <img id="dfaImage" src="" alt="DFA diagram will appear here">
+                <div id="dfaImage"></div>
             </div>
         </div>
     </div>
 </body>
-
+<script src="https://cdn.jsdelivr.net/npm/viz.js@2.1.2/viz.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/viz.js@2.1.2/full.render.js"></script>
 <script>
 let currentRule = null;
 
@@ -446,11 +447,24 @@ document.getElementById("buildBtn").onclick = async () => {
         })
     });
 
-    const data = await res.json();
+    //const data = await res.json();
 
-    const img = document.getElementById("dfaImage");
-    img.src = "https://dfa-generator-0kvl.onrender.com/" + data.image;
-    img.classList.add("visible");
+    //const img = document.getElementById("dfaImage");
+    //img.src = "https://dfa-generator-0kvl.onrender.com/" + data.image;
+    //img.classList.add("visible");
+
+    const data = await res.json();
+    const viz = new Viz();
+
+    viz.renderSVGElement(data.dot)
+    .then(function(element) {
+        const container = document.getElementById("dfaImage");
+        container.innerHTML = "";        // clear old
+        container.appendChild(element);  // add new diagram
+    })
+    .catch(error => {
+        console.error(error);
+    });
 };
 
 document.getElementById("testBtn").onclick = async () => {

@@ -38,3 +38,25 @@ class DFA:
                 dot.edge(src, dst, label=sym)
 
         dot.render(filename, cleanup=True)
+        
+    def to_dot(self):
+        dot = "digraph {\n"
+        dot += "rankdir=LR;\n"
+
+        # start arrow
+        dot += '"" [shape=none]\n'
+        dot += f'"" -> {self.start_state}\n'
+
+        # states
+        for state in self.states:
+            shape = "doublecircle" if state in self.accept_states else "circle"
+            dot += f'{state} [shape={shape}]\n'
+
+        # transitions
+        for state in self.transitions:
+            for sym in self.transitions[state]:
+                next_state = self.transitions[state][sym]
+                dot += f'{state} -> {next_state} [label="{sym}"]\n'
+
+        dot += "}"
+        return dot
