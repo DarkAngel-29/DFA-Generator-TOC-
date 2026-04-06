@@ -466,6 +466,7 @@
             const container = document.getElementById("dfaImage");
             container.innerHTML = "";
             container.appendChild(element);
+            container.style.display = "block";   // 🔥 ADD THIS
         })
         .catch(error => {
             console.error("Viz ERROR:", error);
