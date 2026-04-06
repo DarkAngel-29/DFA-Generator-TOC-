@@ -369,127 +369,132 @@
             </div>
         </div>
     </div>
-</body>
-<script src="https://cdn.jsdelivr.net/npm/viz.js@2.1.2/viz.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/viz.js@2.1.2/full.render.js"></script>
-<script>
-let currentRule = null;
 
-// Utility: hide all input boxes
-function hideAllInputs() {
-    document.getElementById("alphabetBox").classList.remove("visible");
-    document.getElementById("symbolBox").classList.remove("visible");
-    document.getElementById("patternBox").classList.remove("visible");
-    document.getElementById("kBox").classList.remove("visible");
-}
+    <script src="https://cdn.jsdelivr.net/npm/viz.js@2.1.2/viz.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/viz.js@2.1.2/full.render.js"></script>
+    <script>
+    let currentRule = null;
 
-// Utility: deactivate all rule buttons
-function deactivateButtons() {
-    document.querySelectorAll(".rule-btn").forEach(btn => {
-        btn.classList.remove("active");
-    });
-}
-
-// Core: handle rule selection
-function selectRule(rule, btnId) {
-    currentRule = rule;
-    hideAllInputs();
-    deactivateButtons();
-
-    document.getElementById(btnId).classList.add("active");
-    document.getElementById("alphabetBox").classList.add("visible");
-
-    if (["even", "odd"].includes(rule)) {
-        document.getElementById("symbolBox").classList.add("visible");
+    // Utility: hide all input boxes
+    function hideAllInputs() {
+        document.getElementById("alphabetBox").classList.remove("visible");
+        document.getElementById("symbolBox").classList.remove("visible");
+        document.getElementById("patternBox").classList.remove("visible");
+        document.getElementById("kBox").classList.remove("visible");
     }
 
-    if (["starts_with", "ends_with", "contains", "no_substring"].includes(rule)) {
-        document.getElementById("patternBox").classList.add("visible");
+    // Utility: deactivate all rule buttons
+    function deactivateButtons() {
+        document.querySelectorAll(".rule-btn").forEach(btn => {
+            btn.classList.remove("active");
+        });
     }
 
-    if (["exact_count", "at_least", "length_mod"].includes(rule)) {
-        document.getElementById("kBox").classList.add("visible");
+    // Core: handle rule selection
+    function selectRule(rule, btnId) {
+        currentRule = rule;
+        hideAllInputs();
+        deactivateButtons();
+
+        document.getElementById(btnId).classList.add("active");
+        document.getElementById("alphabetBox").classList.add("visible");
+
+        if (["even", "odd"].includes(rule)) {
+            document.getElementById("symbolBox").classList.add("visible");
+        }
+
+        if (["starts_with", "ends_with", "contains", "no_substring"].includes(rule)) {
+            document.getElementById("patternBox").classList.add("visible");
+        }
+
+        if (["exact_count", "at_least", "length_mod"].includes(rule)) {
+            document.getElementById("kBox").classList.add("visible");
+        }
     }
-}
 
-// Button bindings
-document.getElementById("btn-even").onclick = () => selectRule("even", "btn-even");
-document.getElementById("btn-odd").onclick = () => selectRule("odd", "btn-odd");
-document.getElementById("btn-starts").onclick = () => selectRule("starts_with", "btn-starts");
-document.getElementById("btn-ends").onclick = () => selectRule("ends_with", "btn-ends");
-document.getElementById("btn-contains").onclick = () => selectRule("contains", "btn-contains");
-document.getElementById("btn-no-substring").onclick = () => selectRule("no_substring", "btn-no-substring");
-document.getElementById("btn-exact").onclick = () => selectRule("exact_count", "btn-exact");
-document.getElementById("btn-at-least").onclick = () => selectRule("at_least", "btn-at-least");
-document.getElementById("btn-length-mod").onclick = () => selectRule("length_mod", "btn-length-mod");
+    // Button bindings
+    document.getElementById("btn-even").onclick = () => selectRule("even", "btn-even");
+    document.getElementById("btn-odd").onclick = () => selectRule("odd", "btn-odd");
+    document.getElementById("btn-starts").onclick = () => selectRule("starts_with", "btn-starts");
+    document.getElementById("btn-ends").onclick = () => selectRule("ends_with", "btn-ends");
+    document.getElementById("btn-contains").onclick = () => selectRule("contains", "btn-contains");
+    document.getElementById("btn-no-substring").onclick = () => selectRule("no_substring", "btn-no-substring");
+    document.getElementById("btn-exact").onclick = () => selectRule("exact_count", "btn-exact");
+    document.getElementById("btn-at-least").onclick = () => selectRule("at_least", "btn-at-least");
+    document.getElementById("btn-length-mod").onclick = () => selectRule("length_mod", "btn-length-mod");
 
 
-document.getElementById("buildBtn").onclick = async () => {
-    if (!currentRule) {
-        alert("Select a rule first");
-        return;
-    }
+    document.getElementById("buildBtn").onclick = async () => {
+        if (!currentRule) {
+            alert("Select a rule first");
+            return;
+        }
 
-    const alphabet = document.getElementById("alphabet").value.split(",");
-    const symbol = document.getElementById("symbol").value;
-    const pattern = document.getElementById("pattern").value;
-    const k = Number(document.getElementById("k").value);
+        const alphabet = document.getElementById("alphabet").value
+            .split(",")
+            .map(x => x.trim());
+        const symbol = document.getElementById("symbol").value;
+        const pattern = document.getElementById("pattern").value;
+        const k = Number(document.getElementById("k").value);
 
-    const res = await fetch("https://dfa-generator-0kvl.onrender.com/build", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({
-            rule: currentRule,
-            alphabet: alphabet,
-            symbol: symbol,
-            pattern: pattern,
-            k: k
+        const res = await fetch("https://dfa-generator-0kvl.onrender.com/build", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                rule: currentRule,
+                alphabet: alphabet,
+                symbol: symbol,
+                pattern: pattern,
+                k: k
+            })
+        });
+
+        //const data = await res.json();
+
+        //const img = document.getElementById("dfaImage");
+        //img.src = "https://dfa-generator-0kvl.onrender.com/" + data.image;
+        //img.classList.add("visible");
+
+        const data = await res.json();
+        console.log("DOT:", data.dot);
+
+        const viz = new Viz();
+
+        viz.renderSVGElement(data.dot)
+        .then(function(element) {
+            console.log("Rendered SVG");
+            const container = document.getElementById("dfaImage");
+            container.innerHTML = "";
+            container.appendChild(element);
         })
-    });
+        .catch(error => {
+            console.error("Viz ERROR:", error);
+        });
+    };
 
-    //const data = await res.json();
+    document.getElementById("testBtn").onclick = async () => {
+        const s = document.getElementById("testString").value;
 
-    //const img = document.getElementById("dfaImage");
-    //img.src = "https://dfa-generator-0kvl.onrender.com/" + data.image;
-    //img.classList.add("visible");
+        const res = await fetch("https://dfa-generator-0kvl.onrender.com/test", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ string: s })
+        });
 
-    const data = await res.json();
-    const viz = new Viz();
+        const data = await res.json();
+        console.log("Test response:", data);
+        const result = document.getElementById("result");
 
-    viz.renderSVGElement(data.dot)
-    .then(function(element) {
-        const container = document.getElementById("dfaImage");
-        container.innerHTML = "";        // clear old
-        container.appendChild(element);  // add new diagram
-    })
-    .catch(error => {
-        console.error(error);
-    });
-};
+        if (data.valid) {
+            result.textContent = "VALID";
+            result.className = "valid";
+        } else {
+            result.textContent = "INVALID";
+            result.className = "invalid";
+        }
+    };
 
-document.getElementById("testBtn").onclick = async () => {
-    const s = document.getElementById("testString").value;
-
-    const res = await fetch("https://dfa-generator-0kvl.onrender.com/test", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ string: s })
-    });
-
-    const data = await res.json();
-    console.log("Test response:", data);
-    const result = document.getElementById("result");
-
-    if (data.valid) {
-        result.textContent = "VALID";
-        result.className = "valid";
-    } else {
-        result.textContent = "INVALID";
-        result.className = "invalid";
-    }
-};
-
-</script>
-
+    </script>
+</body>
 
 </html>
